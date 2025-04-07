@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cafe Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title {
+            color: #333;
+            margin: 0;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+        .sidebar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-title {
+            margin: 0 0 20px 0;
+            font-size: 1.2rem;
+        }
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .category-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .category-item:hover {
+            background-color: #f0f0f0;
+        }
+        .category-item.active {
+            background-color: #333;
+            color: white;
+        }
+        .main-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-product-btn {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+        }
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .product-name {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+        .product-price {
+            color: #666;
+            margin: 0 0 10px 0;
+        }
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            margin: 50px auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .save-btn, .cancel-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .login-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .login-btn {
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .error-message {
+            color: #f44336;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <h2>Admin Login</h2>
+        <form id="loginForm" class="login-form">
+            <input type="email" id="email" class="login-input" placeholder="Email" required>
+            <input type="password" id="password" class="login-input" placeholder="Password" required>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <div id="dashboardContainer" style="display: none;">
+        <div class="header">
+            <h1 class="title">Dashboard - Cafe Menu</h1>
+            <button id="logoutBtn" style="position: absolute; right: 20px; top: 20px; padding: 10px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+        </div>
+        <div class="container">
+            <div class="dashboard">
+                <div class="sidebar">
+                    <h2 class="sidebar-title">Categories</h2>
+                    <ul class="category-list" id="categoryList">
+                        <!-- Categories will be loaded here -->
+                    </ul>
+                </div>
+                <div class="main-content">
+                    <div class="products-header">
+                        <h2>Products</h2>
+                        <button class="add-product-btn" id="addProductBtn">Add Product</button>
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Add Product</h2>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Price (EGP)</label>
+                        <input type="number" id="productPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productImage">Image URL</label>
+                        <input type="text" id="productImage" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="save-btn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // Login functionality
+        const loginForm = document.getElementById('loginForm');
+        const loginContainer = document.getElementById('loginContainer');
+        const dashboardContainer = document.getElementById('dashboardContainer');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    loginContainer.style.display = 'none';
+                    dashboardContainer.style.display = 'block';
+                    loadData();
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                });
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                dashboardContainer.style.display = 'none';
+                loginContainer.style.display = 'block';
+            });
+        });
+
+        // Load data from Firebase
+        function loadData() {
+            database.ref('menu').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    categories.forEach(category => {
+                        if (data[category.id]) {
+                            category.products = data[category.id].products || [];
+                        }
+                    });
+                    if (currentCategory) {
+                        loadProducts(currentCategory);
+                    }
+                }
+            });
+        }
+
+        // Save to Firebase
+        function saveToFirebase() {
+            const menuData = {};
+            categories.forEach(category => {
+                menuData[category.id] = {
+                    name: category.name,
+                    icon: category.icon,
+                    products: category.products
+                };
+            });
+            database.ref('menu').set(menuData);
+        }
+
+        // Replace saveToLocalStorage with saveToFirebase
+        function saveToLocalStorage() {
+            saveToFirebase();
+        }
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loginContainer.style.display = 'none';
+                dashboardContainer.style.display = 'block';
+                loadData();
+            } else {
+                loginContainer.style.display = 'block';
+                dashboardContainer.style.display = 'none';
+            }
+        });
+
+        // Load categories from index.html
+        const categories = [
+            {
+                id: 'hot-drinks',
+                name: 'Hot Drinks',
+                icon: '☕',
+                products: []
+            },
+            {
+                id: 'fresh-juice',
+                name: 'Fresh Juice',
+                icon: '🍹',
+                products: []
+            },
+            {
+                id: 'iced-drinks',
+                name: 'Iced Drinks',
+                icon: '🥤',
+                products: []
+            },
+            {
+                id: 'smoothies',
+                name: 'Smoothies',
+                icon: '🥤',
+                products: []
+            },
+            {
+                id: 'frappe',
+                name: 'Frappe',
+                icon: '🍧',
+                products: []
+            },
+            {
+                id: 'milk-shake',
+                name: 'Milk Shake',
+                icon: '🥛',
+                products: []
+            },
+            {
+                id: 'winter-corner',
+                name: 'Winter Corner',
+                icon: '❄️',
+                products: []
+            },
+            {
+                id: 'ice-cream',
+                name: 'Ice Cream',
+                icon: '🍦',
+                products: []
+            }
+        ];
+
+        let currentCategory = null;
+        let editingProduct = null;
+
+        // Load categories in sidebar
+        const categoryList = document.getElementById('categoryList');
+        categories.forEach(category => {
+            const categoryItem = document.createElement('li');
+            categoryItem.className = 'category-item';
+            categoryItem.innerHTML = `
+                <span>${category.icon} ${category.name}</span>
+            `;
+            categoryItem.addEventListener('click', () => {
+                document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+                categoryItem.classList.add('active');
+                currentCategory = category;
+                loadProducts(category);
+            });
+            categoryList.appendChild(categoryItem);
+        });
+
+        // Load products for a category
+        function loadProducts(category) {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+            
+            category.products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-price">${product.price} EGP</p>
+                    <div class="product-actions">
+                        <button class="edit-btn" onclick="editProduct('${category.id}', ${product.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteProduct('${category.id}', ${product.id})">Delete</button>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Modal functionality
+        const modal = document.getElementById('productModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const productForm = document.getElementById('productForm');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        addProductBtn.addEventListener('click', () => {
+            editingProduct = null;
+            modalTitle.textContent = 'Add Product';
+            productForm.reset();
+            modal.style.display = 'block';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Add/Edit product
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const product = {
+                id: editingProduct ? editingProduct.id : Date.now(),
+                name: document.getElementById('productName').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                image: document.getElementById('productImage').value
+            };
+
+            if (editingProduct) {
+                const index = currentCategory.products.findIndex(p => p.id === editingProduct.id);
+                currentCategory.products[index] = product;
+            } else {
+                currentCategory.products.push(product);
+            }
+
+            loadProducts(currentCategory);
+            modal.style.display = 'none';
+            saveToLocalStorage();
+        });
+
+        // Edit product
+        window.editProduct = function(categoryId, productId) {
+            const category = categories.find(c => c.id === categoryId);
+            const product = category.products.find(p => p.id === productId);
+            
+            editingProduct = product;
+            modalTitle.textContent = 'Edit Product';
+            
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productImage').value = product.image;
+            
+            modal.style.display = 'block';
+        };
+
+        // Delete product
+        window.deleteProduct = function(categoryId, productId) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                const category = categories.find(c => c.id === categoryId);
+                category.products = category.products.filter(p => p.id !== productId);
+                loadProducts(category);
+                saveToLocalStorage();
+            }
+        };
+
+        // Initialize
+        if (categories.length > 0) {
+            currentCategory = categories[0];
+            document.querySelector('.category-item').click();
+        }
+    </script>
+</body>
+</html> 

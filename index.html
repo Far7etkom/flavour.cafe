@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #8B4513; /* Brown color */
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: white;
+        }
+        .title {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .category-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .category-name {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .products-container {
+            display: none;
+            margin-top: 30px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-name {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .product-price {
+            color: #666;
+            margin: 5px 0 0;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #8B4513; /* Brown color */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #8B4513;
+            color: white;
+        }
+        .social-links {
+            margin-bottom: 10px;
+        }
+        .social-links a {
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+        .designer {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Cafe Menu</h1>
+    </div>
+    <div class="container">
+        <div class="categories" id="categories">
+            <!-- Categories will be loaded here -->
+        </div>
+        <div class="products-container" id="productsContainer">
+            <a href="#" class="back-button" id="backButton">← Back to Menu</a>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="social-links">
+            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+        <div class="designer">Designed by Ahmed Idrees</div>
+    </footer>
+
+    <script>
+        const categories = [
+            {
+                id: 'hot-drinks',
+                name: 'Hot Drinks',
+                icon: '☕',
+                products: [
+   
+  { id: 1, name: 'Con Panna Espresso', price: '55 EGP', image: 'images/61.jpg' },
+  { id: 2, name: 'Cappuccino', price: '65 EGP', image: 'images/62.png' },
+  { id: 3, name: 'Café Latte', price: '55 EGP', image: 'images/63.jpg' },
+  { id: 4, name: 'Flat White', price: '65 EGP', image: 'images/64.png' },
+  { id: 5, name: 'Matcha Latte', price: '60 EGP', image: 'images/65.jpg' },
+  { id: 6, name: 'Cortado', price: '55 EGP', image: 'images/66.png' },
+  { id: 7, name: 'Espresso', price: '30 EGP', image: 'images/67.jpg' },
+  { id: 8, name: 'Hot Chocolate', price: '50 EGP', image: 'images/68.jpg' },
+  { id: 9, name: 'Mocha Coffee', price: '65 EGP', image: 'images/69.png' },
+  { id: 10, name: 'White Mocha', price: '65 EGP', image: 'images/70.png' },
+  { id: 11, name: 'Spanish Latte', price: '75 EGP', image: 'images/71.png' },
+  { id: 12, name: 'Caramel Latte', price: '65 EGP', image: 'images/72.png' },
+  { id: 13, name: 'Turkish Coffee', price: '20 EGP', image: 'images/73.jpg' },
+  { id: 14, name: 'French Coffee', price: '30 EGP', image: 'images/74.jpg' },
+  { id: 15, name: 'Nescafe', price: '35 EGP', image: 'images/75.jpg' },
+  { id: 16, name: 'Tea', price: '10 EGP', image: 'images/76.jpg' },
+  { id: 17, name: 'Milk Tea', price: '20 EGP', image: 'images/78.jpg' },
+  { id: 18, name: 'Karak Tea', price: '35 EGP', image: 'images/79.jpg' },
+  { id: 19, name: 'Green Tea', price: '15 EGP', image: 'images/80.png' },
+  { id: 20, name: 'Herbal Tea', price: '15 EGP', image: 'images/81.jpg' },
+  { id: 21, name: 'Macchiato', price: '35 EGP', image: 'images/82.jpg' },
+  { id: 22, name: 'Red Velvet Hot Chocolate', price: '60 EGP', image: 'images/83.jpg' }
+]
+
+
+            },
+            {
+                id: 'Summer-drinks',
+                name: 'summer drinks',
+                icon: '🍷',
+                products: 
+                [
+                
+  { id: 10, name: 'Power Drink', price: 110, image: 'images/from36.png', description: 'Ingredients: Avocado, cashew, pistachio, banana, honey' },
+  { id: 11, name: 'Paradis', price: 60, image: 'images/from37.jpg', description: 'Ingredients: Mango, banana, strawberry, kiwi, ice cream' },
+  { id: 12, name: 'Mango Beach', price: 55, image: 'images/from30.jpg', description: 'Ingredients: Mango, vanilla, peach' },
+  { id: 13, name: 'Mango Kiwi', price: 60, image: 'images/from31.jpg', description: 'Ingredients: Mango, kiwi, ice cream' },
+  { id: 14, name: 'Isfahani', price: 80, image: 'images/from32.jpg', description: 'Ingredients: Mango, avocado, nuts' },
+  { id: 15, name: 'Power Cashew', price: 80, image: 'images/from33.png', description: 'Ingredients: Dates, cashew' },
+  { id: 16, name: 'Fruit Salad', price: 50, image: 'images/from34.jpg', description: 'A mix of fresh fruits' },
+  { id: 17, name: 'Colorts', price: 50, image: 'images/from35.jpg', description: 'Ingredients: Kiwi, lemon, mint' }
+]
+
+
+            },
+            {
+                id: 'fresh-juice',
+                name: 'Fresh Juice',
+                icon: '🍹',
+                products: 
+                [
+                
+  { id: 83, name: 'Kiwi', price: 70, image: 'images/84.png' },
+  { id: 84, name: 'Banana with Milk', price: 40, image: 'images/85.png' },
+  { id: 85, name: 'Watermelon', price: 30, image: 'images/86.png' },
+  { id: 86, name: 'Mango', price: 40, image: 'images/87.png' },
+  { id: 87, name: 'Strawberry', price: 35, image: 'images/88.png' },
+  { id: 88, name: 'Guava', price: 35, image: 'images/89.png' },
+  { id: 89, name: 'Lemon with Mint', price: 35, image: 'images/90.png' },
+  { id: 90, name: 'Peach', price: 55, image: 'images/91.png' },
+  { id: 91, name: 'Orange', price: 35, image: 'images/92.png' }
+]
+
+
+
+            },
+            {
+                id: 'iced-drinks',
+                name: 'Iced Drinks',
+                icon: '☕️🧊',
+                products:[
+    { id: 1, name: 'Iced Coffee', price: 55, image: 'images/22.jpeg' },
+    { id: 2, name: 'Iced Latte', price: 65, image: 'images/23.png' },
+    { id: 3, name: 'Iced Caramel Latte', price: 65, image: 'images/24.png' },
+    { id: 4, name: 'Iced Mocha', price: 65, image: 'images/25.png' },
+    { id: 5, name: 'Iced White Mocha', price: 70, image: 'images/26.jpg' },
+    { id: 6, name: 'White Mocha with Extra Cream', price: 95, image: 'images/27.png' },
+    { id: 7, name: 'Iced Spanish Latte', price: 80, image: 'images/28.jpg' },
+    { id: 8, name: 'Iced Matcha', price: 60, image: 'images/29.jpg' }
+]
+
+            },
+            {
+                id: 'smoothies',
+                name: 'Smoothies',
+                icon: '🥤',
+                products: [
+    { id: 1, name: 'Blueberry Smoothie', price: 60, image: 'images/30.jpg' },
+    { id: 2, name: 'Passion Fruit Smoothie', price: 65, image: 'images/31.jpg' },
+    { id: 3, name: 'Peach Smoothie', price: 60, image: 'images/32.jpg' },
+    { id: 4, name: 'Kiwi Smoothie', price: 80, image: 'images/33.jpg' },
+    { id: 5, name: 'Strawberry Smoothie', price: 40, image: 'images/34.jpg' },
+    { id: 6, name: 'Mango Smoothie', price: 45, image: 'images/35.jpg' },
+    { id: 7, name: 'Lemon Mint Smoothie', price: 40, image: 'images/36.png' }
+]
+
+            },
+            {
+                id: 'frappe',
+                name: 'Frappe',
+                icon: '🍧',
+                products:[
+    { id: 1, name: 'Matcha Frappe', price: 65, image: 'images/57.jpg' },
+    { id: 2, name: 'Caramel Frappe', price: 65, image: 'images/55.png' },
+    { id: 3, name: 'Vanilla Frappe', price: 55, image: 'images/58.png' },
+    { id: 4, name: 'Mocha Frappe', price: 65, image: 'images/56.png' },
+    { id: 5, name: 'Coffee Frappe', price: 60, image: 'images/60.png' },
+    { id: 6, name: 'White Mocha Frappe', price: 70, image: 'images/59.png' }
+]
+
+
+
+            },
+            {
+                id: 'milk-shake',
+                name: 'Milk Shake',
+                icon: '🥛',
+                products:[
+               
+    { id: 1, name: 'Passion Fruit', price: 65, image: 'images/37.png' },
+    { id: 2, name: 'Blueberry', price: 65, image: 'images/38.png' },
+    { id: 3, name: 'Mixed Berry', price: 70, image: 'images/39.png' },
+    { id: 4, name: 'Kiwi', price: 65, image: 'images/40.png' },
+    { id: 5, name: 'Peach', price: 60, image: 'images/41.png' },
+    { id: 6, name: 'Watermelon', price: 55, image: 'images/42.png' },
+    { id: 7, name: 'Mango', price: 55, image: 'images/43.png' },
+    { id: 8, name: 'Strawberry', price: 55, image: 'images/44.png' },
+    { id: 9, name: 'Marshmallow', price: 65, image: 'images/45.png' },
+    { id: 10, name: 'Vanilla', price: 50, image: 'images/46.png' },
+    { id: 11, name: 'Chocolate', price: 50, image: 'images/47.png' },
+    { id: 12, name: 'Lotus', price: 70, image: 'images/48.png' },
+    { id: 13, name: 'Oreo', price: 55, image: 'images/49.png' },
+    { id: 14, name: 'Pistachio', price: 75, image: 'images/50.webp' },
+    { id: 15, name: 'Lagoon', price: 60, image: 'images/51.png' },
+    { id: 16, name: 'Lemon', price: 50, image: 'images/52.jpg' },
+    { id: 17, name: 'Pineapple', price: 60, image: 'images/53.png' },
+    { id: 18, name: 'Pineapple Mango', price: 70, image: 'images/54.jpg' }
+
+
+]
+
+
+            },
+            {
+                id: 'winter-corner',
+                name: 'Winter Corner',
+                icon: '❄️',
+                products: [
+                
+    { id: 1, name: 'Hot Cider', price: 40,  description: 'Hot Cider' },
+    { id: 2, name: 'Sahlab', price: 30,  description: 'Sahlab' },
+    { id: 3, name: 'Sahlab with Nuts', price: 50,  description: 'Sahlab with Nuts' },
+    { id: 4, name: 'Sahlab with Fruits', price: 50,  description: 'Sahlab with Fruits' },
+    { id: 5, name: 'Sahlab Chocolate', price: 35,  description: 'Sahlab Chocolate' },
+    { id: 6, name: 'Sahlab Chocolate with Nuts', price: 55, description: 'Sahlab Chocolate with Nuts' },
+    { id: 7, name: 'Hot Oreo', price: 55, description: 'Hot Oreo' }
+                ]
+            },
+            {
+                id: 'ice-cream',
+                name: 'Ice Cream',
+                icon: '🍦',
+                products: [
+                    { id: 1, name: 'One Bowl Ice-cream', price: 40, image: 'images/delicious-ice-cream-with-topping.jpg' },
+                    
+                ]
+            },{
+                id: 'cold-drinks',
+                name: 'Cold Drinks',
+                icon: '🥃',
+                products: [
+    { id: 1, name: 'Redbull', price: 60, image: 'images/6.jpeg', description: 'Redbull' },
+    { id: 2, name: 'Fayrouz', price: 25, image: 'images/7.jpeg', description: 'Fayrouz' },
+    { id: 3, name: 'V Cola', price: 23, image: 'images/8.jpeg', description: 'V Cola' },
+    { id: 4, name: '7 Up', price: 23, image: 'images/9.jpeg', description: '7 Up' },
+    { id: 5, name: 'Schweppes', price: 23, image: 'images/1.jpeg', description: 'Schweppes' },
+    { id: 6, name: 'Miranda', price: 23, image: 'images/2.jpeg', description: 'Miranda' },
+    { id: 7, name: 'Small Water', price: 10, image: 'images/3.jpeg', description: 'Small Water' },
+    { id: 8, name: 'Sting', price: 23, image: 'images/4.jpeg', description: 'Sting' },
+    { id: 9, name: 'Birell', price: 27, image: 'images/5.jpeg', description: 'Birell' }
+]
+
+            },
+            {
+                id: 'mocktails',
+                name: 'mocktails',
+                icon: '🍸',
+                products: [
+  { id: 10, name: 'Lavender', price: 45, image: 'images/11.png', description: 'Ingredients: Lemon juice, lavender' },
+  { id: 11, name: 'Sun Shine', price: 55, image: 'images/12.png', description: 'Ingredients: Strawberry, lemon, soda' },
+  { id: 12, name: 'Sun Set', price: 60, image: 'images/13.png', description: 'Ingredients: Strawberry, orange, lemon, soda' },
+  { id: 13, name: 'Blue Sky', price: 55, image: 'images/14.png', description: 'Ingredients: Blue Curacao, lemon, soda' },
+  { id: 14, name: 'Skutch Mint', price: 55, image: 'images/15.png', description: 'Ingredients: Mint, lemon, soda' },
+  { id: 15, name: 'Blue Passion', price: 70, image: 'images/16.png', description: 'Ingredients: Passion fruit, Blue Curacao, lemon, soda' },
+  { id: 16, name: 'Peach Mojito', price: 55, image: 'images/17.png', description: 'Ingredients: Peach, lemon, soda' },
+  { id: 17, name: 'Blue Power', price: 95, image: 'images/18.png', description: 'Ingredients: Red Bull, Blue Curacao, lemon, soda' },
+  { id: 18, name: 'Passion Fruit Mojito', price: 60, image: 'images/19.png', description: 'Ingredients: Passion fruit, lemon, soda' },
+  { id: 19, name: 'Gum', price: 50, image: 'images/20.png', description: 'Gum' },
+  { id: 20, name: 'Apple Mint', price: 65, image: 'images/21.png', description: 'Ingredients: Apple, mint' }
+]
+
+
+            },
+        ];
+
+        // Load categories
+        const categoriesContainer = document.getElementById('categories');
+        categories.forEach(category => {
+            const categoryCard = document.createElement('div');
+            categoryCard.className = 'category-card';
+            categoryCard.innerHTML = `
+                <div class="category-icon">${category.icon}</div>
+                <h2 class="category-name">${category.name}</h2>
+            `;
+            categoryCard.addEventListener('click', () => showProducts(category));
+            categoriesContainer.appendChild(categoryCard);
+        });
+
+        // Show products for a category
+        function showProducts(category) {
+            document.getElementById('categories').style.display = 'none';
+            const productsContainer = document.getElementById('productsContainer');
+            const productsGrid = document.getElementById('productsGrid');
+            
+            productsContainer.style.display = 'block';
+            productsGrid.innerHTML = '';
+            
+            category.products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-price">${product.price} EGP</p>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Back button functionality
+        document.getElementById('backButton').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('categories').style.display = 'grid';
+            document.getElementById('productsContainer').style.display = 'none';
+        });
+    </script>
+</body>
+</html> 
